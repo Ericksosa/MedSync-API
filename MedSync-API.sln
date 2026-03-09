@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35514.174 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync-API", "MedSync-API.csproj", "{49829676-C797-4117-BB3E-B7505FEAD481}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedSync_API", "MedSync_API.csproj", "{49829676-C797-4117-BB3E-B7505FEAD481}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
