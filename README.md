@@ -1,93 +1,100 @@
-# MedSync - Aplicación de Telemedicina para Gestión de Citas Médicas
+# 🩺 MedSync – Plataforma de Telemedicina para Gestión de Citas Médicas
 
 ---
 
-##**UNIVERSIDAD APEC**##
+## 📚 UNIVERSODAD APEC
 
-## SUSTENTADO POR
+**Asignatura:**  
+Desarrollo de Software con Tecnología Open Source  
 
-**JERLYN RODRIGUEZ** – 
-**ERICK SOSA**  
-**JOSUE PINA**
+**Código / Sección:**  
+202610 – ISO815-3173  
 
----
-
-## ASIGNATURA
-
-**DESARROLLO DE SOFTWARE CON TECNOLOGÍA OPEN SOURCE**  
-**202610 ISO815-3173**
+**Facilitador:**  
+Omar Reyes  
 
 ---
 
-## FACILITADOR
+## 👨‍💻 Sustentado por
 
-**OMAR REYES**
-
----
-
-# MedSync API
-
-MedSync es una aplicación orientada a mejorar la gestión de citas médicas mediante una plataforma digital que permite a pacientes y especialistas organizar y administrar consultas médicas de forma eficiente.
-
-La solución busca optimizar el proceso de reservación de citas, reducir los tiempos de espera y mejorar la experiencia tanto para pacientes como para personal médico.
+| Nombre | Matrícula |
+|------|------|
+| Jerlyn Rodriguez | A00113235 |
+| Erick Sosa | A0011321 |
+| Josue Pina | A001 |
 
 ---
 
-# Descripción del Proyecto
+# 📌 Descripción del Proyecto
 
-La aplicación MedSync permite a los pacientes:
+**MedSync** es una aplicación web orientada a la gestión digital de citas médicas mediante una arquitectura basada en **RESTful APIs**.  
 
-- Reservar citas médicas
-- Reprogramar citas existentes
-- Cancelar citas
-- Consultar disponibilidad de especialistas
+El sistema permite a los pacientes reservar, modificar o cancelar citas médicas de forma rápida y eficiente, mientras que los especialistas pueden gestionar su agenda y disponibilidad en tiempo real.
 
-Mientras que los médicos y administradores pueden:
-
-- Gestionar su agenda médica
-- Administrar pacientes
-- Visualizar citas programadas
-- Controlar disponibilidad de horarios
+Esta solución busca modernizar el proceso tradicional de asignación de citas médicas, eliminando procesos manuales y mejorando la experiencia de los pacientes.
 
 ---
 
-# Problemática
+# ⚠️ Problemática
 
-Actualmente muchos centros médicos manejan las citas de forma manual o telefónica, lo que genera:
+En muchos centros médicos de la República Dominicana, la gestión de citas se realiza mediante procesos manuales o llamadas telefónicas. Esto genera diversos problemas:
 
-- Errores en la asignación de horarios
-- Largas esperas para los pacientes
-- Baja satisfacción del usuario
-- Falta de control en la agenda médica
+- ❌ Errores en la asignación de horarios  
+- ❌ Largas esperas para los pacientes  
+- ❌ Falta de control en la agenda médica  
+- ❌ Baja satisfacción del usuario  
+- ❌ Dificultad para gestionar disponibilidad de especialistas  
 
-MedSync propone una solución digital que automatiza este proceso y centraliza la información en un sistema accesible y escalable.
-
----
-
-# Tecnologías Utilizadas
-
-- **ASP.NET Core Web API**
-- **.NET**
-- **Entity Framework**
-- **Swagger**
-- **GitHub**
-- **Base de datos SQL**
+**MedSync** propone una solución tecnológica que automatiza estos procesos y centraliza la información médica en una plataforma digital.
 
 ---
 
-# Arquitectura
+# 🎯 Objetivos del Sistema
 
-El proyecto está basado en una arquitectura **RESTful API**, donde el backend expone endpoints que permiten interactuar con los datos del sistema.
+El proyecto tiene como objetivo principal desarrollar una plataforma que permita:
 
-Ejemplos de operaciones del API:
+- 📅 Reservar citas médicas en línea  
+- 🔄 Reprogramar citas existentes  
+- ❌ Cancelar citas médicas  
+- 👨‍⚕️ Gestionar disponibilidad de doctores  
+- 📊 Mantener control organizado de agendas médicas  
+
+---
+
+# 🏗 Arquitectura del Sistema
+
+El sistema está basado en una **arquitectura RESTful**, donde el backend expone endpoints que permiten a aplicaciones web o móviles interactuar con el sistema.
+
+La arquitectura permite:
+
+- Separación entre frontend y backend  
+- Escalabilidad del sistema  
+- Integración con otras aplicaciones  
+- Manejo eficiente de datos mediante APIs  
+
+---
+
+# ⚙️ Tecnologías Utilizadas
+
+| Tecnología | Uso |
+|------|------|
+| ASP.NET Core | Desarrollo del API |
+| .NET | Framework de desarrollo |
+| Entity Framework | Acceso y manejo de datos |
+| Swagger | Documentación y pruebas del API |
+| GitHub | Control de versiones |
+| SQL Database | Almacenamiento de datos |
+
+---
+
+# 🔗 Ejemplo de Endpoints REST
 
 | Método | Endpoint | Descripción |
 |------|------|------|
-| GET | /api/appointments | Listar citas |
-| POST | /api/appointments | Crear nueva cita |
-| PUT | /api/appointments/{id} | Actualizar cita |
-| DELETE | /api/appointments/{id} | Eliminar cita |
+| GET | `/api/appointments` | Obtener todas las citas |
+| GET | `/api/appointments/{id}` | Obtener una cita específica |
+| POST | `/api/appointments` | Crear una nueva cita |
+| PUT | `/api/appointments/{id}` | Actualizar una cita |
+| DELETE | `/api/appointments/{id}` | Eliminar una cita |
 
----
 
-# Estructura del Proyecto
