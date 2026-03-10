@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 2. Configurar servicios básicos
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Necesario para la interfaz visual de Swagger [cite: 54]
+builder.Services.AddSwaggerGen(); // Necesario para la interfaz visual de Swagger 
 
 // 3. Configuración de MySQL
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
@@ -25,19 +25,26 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// 4. Configurar el Middleware (Solo una vez)
+// 4. Configurar el Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();   // Genera el JSON
-    app.UseSwaggerUI(); // Genera la interfaz visual [cite: 54]
+    app.UseSwaggerUI(); // Genera la interfaz visual
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // Importante para la seguridad [cite: 6]
+app.UseAuthorization(); // Importante para la seguridad
 
 app.MapControllers(); // Esto mapea tus controladores de la carpeta /Controllers 
 
-// BORRA ESTA LÍNEA: app.MapHospitalEndpoints(); 
-// (A menos que estés usando Minimal APIs, pero tú tienes controladores físicos)
 
+// --- EJECUTAR MIGRACIONES AUTOMÁTICAMENTE ---
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+// --------------------------------------------
+
+app.Run();
 app.Run();
