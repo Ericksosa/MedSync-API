@@ -25,6 +25,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 // 4. Configurar el Middleware
 if (app.Environment.IsDevelopment())
 {
@@ -36,15 +42,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization(); // Importante para la seguridad
 
 app.MapControllers(); // Esto mapea tus controladores de la carpeta /Controllers 
-
-
-// --- EJECUTAR MIGRACIONES AUTOMÁTICAMENTE ---
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
-}
-// --------------------------------------------
 
 app.Run();
 app.Run();
