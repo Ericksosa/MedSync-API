@@ -20,8 +20,8 @@ Omar Reyes
 | Nombre | Matrícula |
 |------|------|
 | Jerlyn Rodriguez | A00113235 |
-| Erick Sosa | A0011321 |
-| Josue Pina | A001 |
+| Erick Sosa | A00115078 |
+| Eorys Pina | A00115249 |
 
 ---
 
