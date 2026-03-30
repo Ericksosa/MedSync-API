@@ -8,15 +8,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Carga de variables de entorno desde .env -->
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
+
+    <!-- Documentación automática de la API con Swagger -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+
+    <!-- Autenticación JWT Bearer (RF02, RNF04) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12" />
+
+    <!-- ASP.NET Identity para gestión de usuarios y roles (RF02, RNF06) -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.12" />
+
+    <!-- Herramientas de Entity Framework Core para migraciones -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+
+    <!-- Scaffolding de controladores y vistas -->
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.12" />
+
+    <!-- Proveedor MySQL para Entity Framework Core mediante Pomelo -->
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
 </Project>

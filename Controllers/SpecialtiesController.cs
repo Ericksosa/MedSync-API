@@ -1,24 +1,58 @@
-﻿using MedSync_API.Data;
-using MedSync_API.Models;
+using MedSync_API.Models.ViewModels;
+using MedSync_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-[Route("api/[controller]")]
-[ApiController]
-public class SpecialtiesController : ControllerBase
+namespace MedSync_API.Controllers
 {
-    private readonly ApplicationDbContext _context;
-    public SpecialtiesController(ApplicationDbContext context) => _context = context;
-
-    [HttpGet("hospital/{hospitalId}")]
-    public async Task<ActionResult<IEnumerable<Specialty>>> GetSpecialties(int hospitalId) =>
-        await _context.Specialties.Where(s => s.HospitalId == hospitalId).ToListAsync();
-
-    [HttpPost]
-    public async Task<ActionResult<Specialty>> PostSpecialty(Specialty specialty)
+    /// <summary>
+    /// Controlador de especialidades médicas (RF21).
+    /// Gestiona las especialidades disponibles en cada hospital.
+    /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class SpecialtiesController : ControllerBase
     {
-        _context.Specialties.Add(specialty);
-        await _context.SaveChangesAsync();
-        return Ok(specialty);
+        private readonly ISpecialtyService _servicio;
+
+        public SpecialtiesController(ISpecialtyService servicio)
+        {
+            _servicio = servicio;
+        }
+
+        /// <summary>
+        /// Obtiene las especialidades médicas de un hospital específico.
+        /// GET: api/specialties/hospital/1
+        /// </summary>
+        [HttpGet("hospital/{hospitalId:int}")]
+        public async Task<ActionResult<IEnumerable<EspecialidadViewModel>>> ObtenerPorHospital(int hospitalId)
+        {
+            var especialidades = await _servicio.ObtenerPorHospitalAsync(hospitalId);
+            return Ok(especialidades);
+        }
+
+        /// <summary>
+        /// Crea una nueva especialidad médica en un hospital (RF21).
+        /// Solo accesible para Administradores.
+        /// POST: api/specialties
+        /// </summary>
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public async Task<ActionResult<EspecialidadViewModel>> Crear([FromBody] EspecialidadCrearViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var especialidad = await _servicio.CrearAsync(modelo);
+                return Ok(especialidad);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Ya existe esa especialidad en el hospital indicado
+                return Conflict(new { mensaje = ex.Message });
+            }
+        }
     }
 }

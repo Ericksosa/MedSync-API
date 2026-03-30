@@ -1,22 +1,38 @@
-﻿using MedSync_API.Data;
+using MedSync_API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-[Route("api/[controller]")]
-[ApiController]
-public class ReportsController : ControllerBase
+namespace MedSync_API.Controllers
 {
-    private readonly ApplicationDbContext _context;
-    public ReportsController(ApplicationDbContext context) => _context = context;
-
-    // GET: api/Reports/hospital/1/revenue (Rendimiento financiero)
-    [HttpGet("hospital/{id}/revenue")]
-    public async Task<IActionResult> GetRevenue(int id)
+    /// <summary>
+    /// Controlador de reportes financieros y operativos (RF19).
+    /// Genera estadísticas de ingresos por hospital en rangos de fecha configurables.
+    /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(Roles = "Administrador,Doctor")]
+    public class ReportsController : ControllerBase
     {
-        var totalRevenue = await _context.Payments
-            .Where(p => p.Appointment!.HospitalId == id && p.Status == "Completed")
-            .SumAsync(p => p.Amount);
+        private readonly IReportService _servicio;
 
-        return Ok(new { HospitalId = id, TotalRevenue = totalRevenue, Currency = "DOP" });
+        public ReportsController(IReportService servicio)
+        {
+            _servicio = servicio;
+        }
+
+        /// <summary>
+        /// Genera el reporte de ingresos de un hospital.
+        /// Permite filtrar por rango de fechas mediante query strings (RF19).
+        /// GET: api/reports/hospital/1/ingresos?desde=2026-01-01&hasta=2026-03-31
+        /// </summary>
+        [HttpGet("hospital/{hospitalId:int}/ingresos")]
+        public async Task<IActionResult> ObtenerReporteIngresos(
+            int hospitalId,
+            [FromQuery] DateTime? desde = null,
+            [FromQuery] DateTime? hasta = null)
+        {
+            var reporte = await _servicio.ObtenerReporteIngresosAsync(hospitalId, desde, hasta);
+            return Ok(reporte);
+        }
     }
 }
