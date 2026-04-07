@@ -20,9 +20,25 @@ namespace MedSync_API.Services
         }
 
         /// <inheritdoc/>
+        public async Task<IEnumerable<PacienteViewModel>> ObtenerTodosAsync()
+        {
+            var pacientes = await _repo.ObtenerTodosAsync();
+            return pacientes
+                .OrderByDescending(p => p.Id)
+                .Select(MapearAViewModel);
+        }
+
+        /// <inheritdoc/>
         public async Task<PacienteViewModel?> ObtenerPorDocumentoAsync(string documentoId)
         {
             var paciente = await _repo.ObtenerPorDocumentoAsync(documentoId);
+            return paciente is null ? null : MapearAViewModel(paciente);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PacienteViewModel?> ObtenerPorEmailAsync(string email)
+        {
+            var paciente = await _repo.ObtenerPorEmailAsync(email);
             return paciente is null ? null : MapearAViewModel(paciente);
         }
 
@@ -72,6 +88,8 @@ namespace MedSync_API.Services
             paciente.LastName  = modelo.Apellido;
             paciente.Email     = modelo.Email;
             paciente.Phone     = modelo.Telefono;
+            if (modelo.FechaNacimiento.HasValue)
+                paciente.DateOfBirth = modelo.FechaNacimiento.Value;
 
             await _repo.ActualizarAsync(paciente);
         }

@@ -50,6 +50,9 @@ namespace MedSync_API.Data
         /// <summary>Tabla de cobros de consultorio a los médicos (RF17, RF18).</summary>
         public DbSet<DoctorOfficeRent> DoctorOfficeRents { get; set; }
 
+        /// <summary>Tabla puente para la asignacion de médicos a multiples hospitales.</summary>
+        public DbSet<DoctorHospital> DoctorHospitals { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Primero configura las tablas de Identity (AspNetUsers, Roles, etc.)
@@ -87,6 +90,20 @@ namespace MedSync_API.Data
                 .HasOne(p => p.MedicalRecord)
                 .WithOne(e => e.Patient)
                 .HasForeignKey<MedicalRecord>(e => e.PatientId);
+
+            // Relacion muchos-a-muchos entre Doctor y Hospital.
+            modelBuilder.Entity<DoctorHospital>()
+                .HasKey(dh => new { dh.DoctorId, dh.HospitalId });
+
+            modelBuilder.Entity<DoctorHospital>()
+                .HasOne(dh => dh.Doctor)
+                .WithMany(d => d.DoctorHospitals)
+                .HasForeignKey(dh => dh.DoctorId);
+
+            modelBuilder.Entity<DoctorHospital>()
+                .HasOne(dh => dh.Hospital)
+                .WithMany(h => h.DoctorHospitals)
+                .HasForeignKey(dh => dh.HospitalId);
         }
     }
 }

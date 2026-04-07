@@ -16,5 +16,14 @@ namespace MedSync_API.Repositories
 
         /// <summary>Verifica si ya existe un médico con el número de exequátur dado.</summary>
         Task<bool> ExisteExequaturAsync(string exequatur);
+
+        /// <summary>Obtiene los hospitales asignados a un medico.</summary>
+        Task<IEnumerable<Hospital>> ObtenerHospitalesAsignadosAsync(int doctorId);
+
+        /// <summary>Actualiza los hospitales asignados a un medico.</summary>
+        Task ActualizarHospitalesAsignadosAsync(int doctorId, IEnumerable<int> hospitalIds);
+
+        /// <summary>Verifica si existe un hospital.</summary>
+        Task<bool> ExisteHospitalAsync(int hospitalId);
     }
 }

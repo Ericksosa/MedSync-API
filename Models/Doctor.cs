@@ -47,6 +47,9 @@ namespace MedSync_API.Models
         [ForeignKey("HospitalId")]
         public Hospital? Hospital { get; set; }
 
+        /// <summary>Hospitales donde el medico atiende (relacion muchos-a-muchos).</summary>
+        [JsonIgnore] public ICollection<DoctorHospital> DoctorHospitals { get; set; } = new List<DoctorHospital>();
+
         /// <summary>Citas asignadas a este médico (RF08).</summary>
         [JsonIgnore] public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 

@@ -18,6 +18,7 @@ namespace MedSync_API.Repositories
             // Retorna toda la agenda semanal del médico ordenada por día y hora
             return await _dbSet
                 .Where(d => d.DoctorId == doctorId)
+                .Include(d => d.Hospital)
                 .OrderBy(d => d.DayOfWeek)
                 .ThenBy(d => d.StartTime)
                 .ToListAsync();
@@ -29,6 +30,7 @@ namespace MedSync_API.Repositories
             // Filtra las franjas de un día específico para validar disponibilidad al reservar (RF05)
             return await _dbSet
                 .Where(d => d.DoctorId == doctorId && d.DayOfWeek == dayOfWeek)
+                .Include(d => d.Hospital)
                 .OrderBy(d => d.StartTime)
                 .ToListAsync();
         }

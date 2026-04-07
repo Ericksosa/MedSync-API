@@ -17,7 +17,7 @@ namespace MedSync_API.Repositories
         {
             // Incluye la especialidad para enriquecer la respuesta sin llamadas adicionales
             return await _dbSet
-                .Where(d => d.HospitalId == hospitalId)
+                .Where(d => d.HospitalId == hospitalId || d.DoctorHospitals.Any(dh => dh.HospitalId == hospitalId))
                 .Include(d => d.Specialty)
                 .OrderBy(d => d.LastName)
                 .ToListAsync();
@@ -29,7 +29,7 @@ namespace MedSync_API.Repositories
             // Usada al reservar citas para mostrar solo médicos disponibles (RF05)
             return await _dbSet
                 .Where(d => d.SpecialtyId == especialidadId
-                         && d.HospitalId == hospitalId
+                         && (d.HospitalId == hospitalId || d.DoctorHospitals.Any(dh => dh.HospitalId == hospitalId))
                          && d.IsActive)
                 .Include(d => d.Specialty)
                 .OrderBy(d => d.LastName)
@@ -41,6 +41,45 @@ namespace MedSync_API.Repositories
         {
             // Valida unicidad del exequátur antes de registrar un nuevo médico
             return await _dbSet.AnyAsync(d => d.MedicalLicense == exequatur);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Hospital>> ObtenerHospitalesAsignadosAsync(int doctorId)
+        {
+            return await _context.DoctorHospitals
+                .Where(dh => dh.DoctorId == doctorId)
+                .Select(dh => dh.Hospital!)
+                .OrderBy(h => h.Name)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task ActualizarHospitalesAsignadosAsync(int doctorId, IEnumerable<int> hospitalIds)
+        {
+            var ids = hospitalIds.Distinct().ToList();
+
+            var actuales = await _context.DoctorHospitals
+                .Where(dh => dh.DoctorId == doctorId)
+                .ToListAsync();
+
+            _context.DoctorHospitals.RemoveRange(actuales);
+
+            foreach (var hospitalId in ids)
+            {
+                await _context.DoctorHospitals.AddAsync(new DoctorHospital
+                {
+                    DoctorId = doctorId,
+                    HospitalId = hospitalId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> ExisteHospitalAsync(int hospitalId)
+        {
+            return await _context.Hospitals.AnyAsync(h => h.Id == hospitalId);
         }
     }
 }

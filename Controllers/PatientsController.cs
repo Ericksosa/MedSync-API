@@ -23,6 +23,18 @@ namespace MedSync_API.Controllers
         }
 
         /// <summary>
+        /// Obtiene todos los pacientes registrados.
+        /// GET: api/patients
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = "Administrador,Doctor,SuperAdmin")]
+        public async Task<ActionResult<IEnumerable<PacienteViewModel>>> ObtenerTodos()
+        {
+            var pacientes = await _servicio.ObtenerTodosAsync();
+            return Ok(pacientes);
+        }
+
+        /// <summary>
         /// Busca un paciente por su documento de identidad (cédula o pasaporte).
         /// GET: api/patients/documento/40200000000
         /// </summary>
@@ -31,6 +43,18 @@ namespace MedSync_API.Controllers
         {
             var paciente = await _servicio.ObtenerPorDocumentoAsync(documentoId);
             if (paciente is null) return NotFound($"No se encontró un paciente con el documento '{documentoId}'.");
+            return Ok(paciente);
+        }
+
+        /// <summary>
+        /// Busca un paciente por su correo electrónico.
+        /// GET: api/patients/email/user@correo.com
+        /// </summary>
+        [HttpGet("email/{email}")]
+        public async Task<ActionResult<PacienteViewModel>> ObtenerPorEmail(string email)
+        {
+            var paciente = await _servicio.ObtenerPorEmailAsync(email);
+            if (paciente is null) return NotFound($"No se encontró un paciente con el correo '{email}'.");
             return Ok(paciente);
         }
 
@@ -51,7 +75,7 @@ namespace MedSync_API.Controllers
         /// POST: api/patients
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Administrador,Doctor")]
+        [Authorize(Roles = "Administrador,Doctor,Paciente")]
         public async Task<ActionResult<PacienteViewModel>> Crear([FromBody] PacienteCrearViewModel modelo)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);

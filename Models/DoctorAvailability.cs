@@ -18,6 +18,9 @@ namespace MedSync_API.Models
         [Required]
         public int DoctorId { get; set; }
 
+        /// <summary>Hospital al que aplica esta disponibilidad del médico.</summary>
+        public int? HospitalId { get; set; }
+
         /// <summary>
         /// Día de la semana (0 = Lunes, 1 = Martes, ..., 6 = Domingo).
         /// Se usa entero para facilitar comparaciones y consultas.
@@ -38,5 +41,9 @@ namespace MedSync_API.Models
         /// <summary>Médico al que corresponde esta disponibilidad.</summary>
         [ForeignKey("DoctorId")]
         public Doctor? Doctor { get; set; }
+
+        /// <summary>Hospital asociado a la disponibilidad.</summary>
+        [ForeignKey("HospitalId")]
+        public Hospital? Hospital { get; set; }
     }
 }

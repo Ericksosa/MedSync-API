@@ -21,6 +21,13 @@ namespace MedSync_API.Repositories
         }
 
         /// <inheritdoc/>
+        public async Task<Patient?> ObtenerPorEmailAsync(string email)
+        {
+            return await _dbSet
+                .FirstOrDefaultAsync(p => p.Email != null && p.Email == email);
+        }
+
+        /// <inheritdoc/>
         public async Task<bool> ExisteDocumentoAsync(string documentoId)
         {
             // Valida que no se dupliquen pacientes con el mismo documento de identidad

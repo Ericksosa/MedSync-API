@@ -43,21 +43,32 @@ namespace MedSync_API.Services
                 throw new InvalidOperationException(
                     $"Método de pago '{modelo.MetodoPago}' no válido. Use: {string.Join(", ", MetodosPagoValidos)}.");
 
-            // Valida que el estado sea uno de los definidos
-            if (!EstadosPagoValidos.Contains(modelo.Estado))
-                throw new InvalidOperationException(
-                    $"Estado '{modelo.Estado}' no válido. Use: {string.Join(", ", EstadosPagoValidos)}.");
-
             var pago = new Payment
             {
                 AppointmentId = modelo.CitaId,
                 Amount        = modelo.Monto,
                 PaymentMethod = modelo.MetodoPago,
-                Status        = modelo.Estado
+                Status        = "Pending"
             };
 
             await _repo.AgregarAsync(pago);
             return MapearAViewModel(pago);
+        }
+
+        /// <inheritdoc/>
+        public async Task CambiarEstadoAsync(int id, string estado)
+        {
+            if (!EstadosPagoValidos.Contains(estado))
+                throw new InvalidOperationException(
+                    $"Estado '{estado}' no válido. Use: {string.Join(", ", EstadosPagoValidos)}.");
+
+            var pago = await _repo.ObtenerPorIdAsync(id)
+                ?? throw new KeyNotFoundException($"Pago con id {id} no encontrado.");
+
+            pago.Status = estado;
+            pago.PaymentDate = DateTime.UtcNow;
+
+            await _repo.ActualizarAsync(pago);
         }
 
         /// <inheritdoc/>
@@ -78,12 +89,16 @@ namespace MedSync_API.Services
 
         private static PagoViewModel MapearAViewModel(Payment p) => new()
         {
-            Id         = p.Id,
-            CitaId     = p.AppointmentId,
-            Monto      = p.Amount,
-            MetodoPago = p.PaymentMethod,
-            Estado     = p.Status,
-            FechaPago  = p.PaymentDate
+            Id              = p.Id,
+            CitaId          = p.AppointmentId,
+            FechaCita        = p.Appointment?.DateTime ?? default,
+            NombrePaciente   = p.Appointment?.Patient is null ? string.Empty : $"{p.Appointment.Patient.FirstName} {p.Appointment.Patient.LastName}".Trim(),
+            NombreMedico     = p.Appointment?.Doctor is null ? string.Empty : $"{p.Appointment.Doctor.FirstName} {p.Appointment.Doctor.LastName}".Trim(),
+            NombreHospital   = p.Appointment?.Hospital?.Name ?? string.Empty,
+            Monto            = p.Amount,
+            MetodoPago       = p.PaymentMethod,
+            Estado           = p.Status,
+            FechaPago        = p.PaymentDate
         };
     }
 }

@@ -54,4 +54,22 @@ namespace MedSync_API.Models.ViewModels
         [Required]
         public bool EstaActivo { get; set; }
     }
+
+    /// <summary>
+    /// ViewModel para representar un hospital asignado a un medico.
+    /// </summary>
+    public class HospitalAsignadoViewModel
+    {
+        public int HospitalId { get; set; }
+        public string NombreHospital { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// ViewModel para actualizar la lista de hospitales asignados al medico.
+    /// </summary>
+    public class HospitalesAsignadosActualizarViewModel
+    {
+        [Required(ErrorMessage = "Debe enviar al menos un hospital.")]
+        public List<int> HospitalesIds { get; set; } = new();
+    }
 }

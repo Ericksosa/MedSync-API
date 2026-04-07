@@ -115,6 +115,7 @@ builder.Services.AddScoped<IMedicalRecordRepository,      MedicalRecordRepositor
 builder.Services.AddScoped<IDiagnosisRepository,          DiagnosisRepository>();
 builder.Services.AddScoped<IPrescriptionRepository,       PrescriptionRepository>();
 builder.Services.AddScoped<IDoctorAvailabilityRepository, DoctorAvailabilityRepository>();
+builder.Services.AddScoped<IDoctorOfficeRentRepository,  DoctorOfficeRentRepository>();
 
 // ─── 8. Registro de Servicios (inyección de dependencias) ────────────────────
 // Los servicios encapsulan toda la lógica de negocio y son inyectados en los controladores.
@@ -127,6 +128,7 @@ builder.Services.AddScoped<ISpecialtyService,     SpecialtyService>();
 builder.Services.AddScoped<IMedicalRecordService, MedicalRecordService>();
 builder.Services.AddScoped<IReportService,        ReportService>();
 builder.Services.AddScoped<IAuthService,          AuthService>();
+builder.Services.AddScoped<ICobroService,         CobroService>();
 
 // ─── 9. Construcción de la aplicación ────────────────────────────────────────
 var app = builder.Build();

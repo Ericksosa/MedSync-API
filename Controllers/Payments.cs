@@ -56,6 +56,31 @@ namespace MedSync_API.Controllers
         }
 
         /// <summary>
+        /// Actualiza el estado de un pago registrado.
+        /// PATCH: api/payments/5/estado
+        /// </summary>
+        [HttpPatch("{id:int}/estado")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> CambiarEstado(int id, [FromBody] PagoEstadoViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await _servicio.CambiarEstadoAsync(id, modelo.Estado);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Elimina un pago registrado por error.
         /// Solo se permite eliminar pagos en estado "Pending" (RF16).
         /// DELETE: api/payments/5

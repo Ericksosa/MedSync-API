@@ -19,6 +19,11 @@ namespace MedSync_API.Repositories
             return await _dbSet
                 .Where(p => p.Appointment!.HospitalId == hospitalId)
                 .Include(p => p.Appointment)
+                    .ThenInclude(a => a!.Patient)
+                .Include(p => p.Appointment)
+                    .ThenInclude(a => a!.Doctor)
+                .Include(p => p.Appointment)
+                    .ThenInclude(a => a!.Hospital)
                 .OrderByDescending(p => p.PaymentDate)
                 .ToListAsync();
         }
@@ -44,6 +49,14 @@ namespace MedSync_API.Repositories
         {
             // Obtiene el pago asociado a una cita específica (relación 1 a 1)
             return await _dbSet.FirstOrDefaultAsync(p => p.AppointmentId == citaId);
+        }
+
+        /// <inheritdoc/>
+        public async Task<decimal> ObtenerTotalGeneradoPorDoctorAsync(int doctorId)
+        {
+            return await _dbSet
+                .Where(p => p.Appointment!.DoctorId == doctorId && p.Status == "Completed")
+                .SumAsync(p => p.Amount);
         }
     }
 }

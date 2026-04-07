@@ -27,12 +27,18 @@ namespace MedSync_API.Services
         Task CambiarEstadoAsync(int id, bool estaActivo);
 
         /// <summary>Obtiene la disponibilidad horaria de un médico (RF23).</summary>
-        Task<IEnumerable<DisponibilidadViewModel>> ObtenerDisponibilidadAsync(int medicoId);
+        Task<IEnumerable<DisponibilidadViewModel>> ObtenerDisponibilidadAsync(int medicoId, int? hospitalId = null);
 
         /// <summary>Configura una franja horaria de disponibilidad para el médico (RF23).</summary>
         Task<DisponibilidadViewModel> AgregarDisponibilidadAsync(DisponibilidadCrearViewModel modelo);
 
         /// <summary>Elimina una franja de disponibilidad del médico (RF23).</summary>
         Task EliminarDisponibilidadAsync(int disponibilidadId);
+
+        /// <summary>Obtiene los hospitales asignados a un medico.</summary>
+        Task<IEnumerable<HospitalAsignadoViewModel>> ObtenerHospitalesAsignadosAsync(int medicoId);
+
+        /// <summary>Actualiza los hospitales que maneja un medico.</summary>
+        Task ActualizarHospitalesAsignadosAsync(int medicoId, HospitalesAsignadosActualizarViewModel modelo);
     }
 }

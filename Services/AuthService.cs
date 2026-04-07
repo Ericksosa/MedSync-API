@@ -4,6 +4,7 @@ using System.Text;
 using MedSync_API.Models;
 using MedSync_API.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace MedSync_API.Services
@@ -76,6 +77,103 @@ namespace MedSync_API.Services
             await _userManager.AddToRoleAsync(usuario, modelo.Rol);
 
             return GenerarToken(usuario, modelo.Rol);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<UsuarioViewModel>> ObtenerUsuariosAsync(string? rol = null)
+        {
+            if (!string.IsNullOrWhiteSpace(rol))
+            {
+                var usuariosRol = await _userManager.GetUsersInRoleAsync(rol);
+                return usuariosRol.Select(u => new UsuarioViewModel
+                {
+                    Id = u.Id,
+                    Email = u.Email ?? string.Empty,
+                    Nombre = u.Nombre,
+                    Apellido = u.Apellido,
+                    Rol = rol,
+                    EstaActivo = true,
+                    CreadoEn = DateTime.UtcNow
+                });
+            }
+
+            var usuarios = await _userManager.Users.ToListAsync();
+            var resultado = new List<UsuarioViewModel>();
+
+            foreach (var usuario in usuarios)
+            {
+                var roles = await _userManager.GetRolesAsync(usuario);
+                resultado.Add(new UsuarioViewModel
+                {
+                    Id = usuario.Id,
+                    Email = usuario.Email ?? string.Empty,
+                    Nombre = usuario.Nombre,
+                    Apellido = usuario.Apellido,
+                    Rol = roles.FirstOrDefault() ?? string.Empty,
+                    EstaActivo = true,
+                    CreadoEn = DateTime.UtcNow
+                });
+            }
+
+            return resultado;
+        }
+
+        /// <inheritdoc/>
+        public async Task<PerfilUsuarioViewModel?> ObtenerPerfilAsync(string userId)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId);
+            if (usuario is null) return null;
+
+            var rol = (await _userManager.GetRolesAsync(usuario)).FirstOrDefault() ?? string.Empty;
+
+            return new PerfilUsuarioViewModel
+            {
+                Id = usuario.Id,
+                Email = usuario.Email ?? string.Empty,
+                Nombre = usuario.Nombre,
+                Apellido = usuario.Apellido,
+                Rol = rol
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<TokenRespuestaViewModel> ActualizarPerfilAsync(string userId, PerfilActualizarViewModel modelo)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId)
+                ?? throw new KeyNotFoundException("Usuario no encontrado.");
+
+            var emailExistente = await _userManager.FindByEmailAsync(modelo.Email);
+            if (emailExistente is not null && emailExistente.Id != usuario.Id)
+                throw new InvalidOperationException("El correo electrónico ya está en uso por otra cuenta.");
+
+            usuario.Nombre = modelo.Nombre;
+            usuario.Apellido = modelo.Apellido;
+            usuario.Email = modelo.Email;
+            usuario.UserName = modelo.Email;
+
+            var resultado = await _userManager.UpdateAsync(usuario);
+            if (!resultado.Succeeded)
+            {
+                var errores = string.Join("; ", resultado.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"No se pudo actualizar el perfil: {errores}");
+            }
+
+            var rol = (await _userManager.GetRolesAsync(usuario)).FirstOrDefault() ?? string.Empty;
+            return GenerarToken(usuario, rol);
+        }
+
+        /// <inheritdoc/>
+        public async Task CambiarContrasenaAsync(string userId, CambiarContrasenaViewModel modelo)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId)
+                ?? throw new KeyNotFoundException("Usuario no encontrado.");
+
+            var resultado = await _userManager.ChangePasswordAsync(usuario, modelo.ContrasenaActual, modelo.NuevaContrasena);
+            if (!resultado.Succeeded)
+            {
+                var errores = string.Join("; ", resultado.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"No se pudo cambiar la contraseña: {errores}");
+            }
         }
 
         // ─── Generación del token JWT ─────────────────────────────────────────

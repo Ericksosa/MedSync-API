@@ -38,6 +38,10 @@ namespace MedSync_API.Services
                     ? $"{expediente.Patient.FirstName} {expediente.Patient.LastName}"
                     : string.Empty,
                 CreadoEn     = expediente.CreatedAt,
+                RitmoCardiaco = expediente.HeartRate,
+                Temperatura = expediente.Temperature,
+                PresionArterial = expediente.BloodPressure,
+                FechaHoraUltimaActualizacionSignos = expediente.LastVitalsUpdatedAt,
                 Diagnosticos = expediente.Diagnoses.Select(MapearDiagnosticoAViewModel),
                 Recetas      = expediente.Prescriptions.Select(MapearRecetaAViewModel)
             };
@@ -81,6 +85,22 @@ namespace MedSync_API.Services
 
             await _recetaRepo.AgregarAsync(receta);
             return MapearRecetaAViewModel(receta);
+        }
+
+        /// <inheritdoc/>
+        public async Task ActualizarSignosVitalesAsync(int expedienteId, SignosVitalesActualizarViewModel modelo)
+        {
+            var expediente = await _expedienteRepo.ObtenerPorIdAsync(expedienteId)
+                ?? throw new KeyNotFoundException($"Expediente médico con id {expedienteId} no encontrado.");
+
+            expediente.HeartRate = modelo.RitmoCardiaco;
+            expediente.Temperature = modelo.Temperatura;
+            expediente.BloodPressure = string.IsNullOrWhiteSpace(modelo.PresionArterial)
+                ? null
+                : modelo.PresionArterial.Trim();
+            expediente.LastVitalsUpdatedAt = DateTime.UtcNow;
+
+            await _expedienteRepo.ActualizarAsync(expediente);
         }
 
         // ─── Mapeo de dominio a ViewModel ────────────────────────────────────

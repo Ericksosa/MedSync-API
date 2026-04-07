@@ -28,8 +28,8 @@ namespace MedSync_API.Models
         public decimal Amount { get; set; }
 
         /// <summary>
-        /// Periodicidad del cobro.
-        /// Valores válidos: "Mensual", "Quincenal", "Semanal".
+        /// Mes del cobro dentro del año.
+        /// Valores válidos: los 12 meses del calendario en español.
         /// </summary>
         [Required, MaxLength(20)]
         public required string Period { get; set; }

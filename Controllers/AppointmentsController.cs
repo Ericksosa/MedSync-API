@@ -117,5 +117,29 @@ namespace MedSync_API.Controllers
                 return BadRequest(new { mensaje = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Reprograma una cita a una nueva fecha y hora.
+        /// PATCH: api/appointments/5
+        /// </summary>
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> Reprogramar(int id, [FromBody] CitaReprogramarViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await _servicio.ReprogramarAsync(id, modelo.FechaHora);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Cita con id {id} no encontrada.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
     }
 }

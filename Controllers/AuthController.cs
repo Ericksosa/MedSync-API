@@ -2,6 +2,7 @@ using MedSync_API.Models.ViewModels;
 using MedSync_API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MedSync_API.Controllers
 {
@@ -15,10 +16,12 @@ namespace MedSync_API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _servicio;
+        private readonly IPatientService _patientService;
 
-        public AuthController(IAuthService servicio)
+        public AuthController(IAuthService servicio, IPatientService patientService)
         {
             _servicio = servicio;
+            _patientService = patientService;
         }
 
         /// <summary>
@@ -41,14 +44,24 @@ namespace MedSync_API.Controllers
 
         /// <summary>
         /// Registra un nuevo usuario en el sistema con el rol indicado (RF02, RF22).
-        /// Solo accesible para Administradores: son quienes crean cuentas de médicos y administradores.
+        /// El rol Paciente permite auto-registro público; los demás roles requieren Administrador o SuperAdmin.
         /// POST: api/auth/registro
         /// </summary>
         [HttpPost("registro")]
-        [Authorize(Roles = "Administrador")]
+        [AllowAnonymous]
         public async Task<ActionResult<TokenRespuestaViewModel>> Registro([FromBody] RegistroViewModel modelo)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var esRegistroPaciente = string.Equals(modelo.Rol, "Paciente", StringComparison.OrdinalIgnoreCase);
+            if (!esRegistroPaciente)
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                    return Unauthorized(new { mensaje = "Debe iniciar sesión para crear este tipo de usuario." });
+
+                if (!User.IsInRole("Administrador") && !User.IsInRole("SuperAdmin"))
+                    return Forbid();
+            }
 
             try
             {
@@ -58,6 +71,129 @@ namespace MedSync_API.Controllers
             catch (InvalidOperationException ex)
             {
                 // Rol inválido o errores de validación de Identity (contraseña débil, email duplicado, etc.)
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Registra una cuenta de paciente junto con su perfil clínico en una sola operación.
+        /// POST: api/auth/registro-paciente
+        /// </summary>
+        [HttpPost("registro-paciente")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenRespuestaViewModel>> RegistroPaciente([FromBody] PacienteRegistroRequestViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await _patientService.CrearAsync(new PacienteCrearViewModel
+                {
+                    DocumentoId = modelo.DocumentoId,
+                    Nombre = modelo.Nombre,
+                    Apellido = modelo.Apellido,
+                    Email = modelo.Email,
+                    Telefono = modelo.Telefono,
+                    FechaNacimiento = modelo.FechaNacimiento
+                });
+
+                var token = await _servicio.RegistrarAsync(new RegistroViewModel
+                {
+                    Email = modelo.Email,
+                    Contrasena = modelo.Contrasena,
+                    Nombre = modelo.Nombre,
+                    Apellido = modelo.Apellido,
+                    Rol = "Paciente"
+                });
+
+                return Ok(token);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Lista usuarios del sistema, con filtro opcional por rol.
+        /// GET: api/auth/users?rol=Administrador
+        /// </summary>
+        [HttpGet("users")]
+        [Authorize(Roles = "SuperAdmin,Administrador")]
+        public async Task<ActionResult<IEnumerable<UsuarioViewModel>>> ObtenerUsuarios([FromQuery] string? rol)
+        {
+            var usuarios = await _servicio.ObtenerUsuariosAsync(rol);
+            return Ok(usuarios);
+        }
+
+        /// <summary>
+        /// Obtiene el perfil del usuario autenticado.
+        /// GET: api/auth/me
+        /// </summary>
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<ActionResult<PerfilUsuarioViewModel>> ObtenerMiPerfil()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            var perfil = await _servicio.ObtenerPerfilAsync(userId);
+            if (perfil is null) return NotFound(new { mensaje = "Usuario no encontrado." });
+            return Ok(perfil);
+        }
+
+        /// <summary>
+        /// Actualiza nombre y correo del usuario autenticado.
+        /// PUT: api/auth/me
+        /// </summary>
+        [HttpPut("me")]
+        [Authorize]
+        public async Task<ActionResult<TokenRespuestaViewModel>> ActualizarMiPerfil([FromBody] PerfilActualizarViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            try
+            {
+                var token = await _servicio.ActualizarPerfilAsync(userId, modelo);
+                return Ok(token);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Cambia la contraseña del usuario autenticado.
+        /// POST: api/auth/me/cambiar-contrasena
+        /// </summary>
+        [HttpPost("me/cambiar-contrasena")]
+        [Authorize]
+        public async Task<IActionResult> CambiarMiContrasena([FromBody] CambiarContrasenaViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId)) return Unauthorized();
+
+            try
+            {
+                await _servicio.CambiarContrasenaAsync(userId, modelo);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { mensaje = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
                 return BadRequest(new { mensaje = ex.Message });
             }
         }

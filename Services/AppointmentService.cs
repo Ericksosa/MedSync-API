@@ -97,6 +97,27 @@ namespace MedSync_API.Services
             await _repo.ActualizarAsync(cita);
         }
 
+        /// <inheritdoc/>
+        public async Task ReprogramarAsync(int id, DateTime nuevaFechaHora)
+        {
+            var cita = await _repo.ObtenerPorIdAsync(id)
+                ?? throw new KeyNotFoundException($"Cita con id {id} no encontrada.");
+
+            if (cita.Status is "Cancelada" or "Completada")
+                throw new InvalidOperationException($"No se puede reprogramar una cita en estado '{cita.Status}'.");
+
+            if (nuevaFechaHora < DateTime.UtcNow)
+                throw new InvalidOperationException("No se pueden reprogramar citas a fechas pasadas.");
+
+            var agenda = await _repo.ObtenerPorMedicoYFechaAsync(cita.DoctorId, nuevaFechaHora);
+            var existeConflicto = agenda.Any(a => a.Id != id && a.DateTime == nuevaFechaHora && a.Status != "No Presentó");
+            if (existeConflicto)
+                throw new InvalidOperationException("El médico ya tiene una cita programada en ese horario.");
+
+            cita.DateTime = nuevaFechaHora;
+            await _repo.ActualizarAsync(cita);
+        }
+
         // ─── Mapeo de dominio a ViewModel ────────────────────────────────────
 
         private static CitaViewModel MapearAViewModel(Appointment a) => new()

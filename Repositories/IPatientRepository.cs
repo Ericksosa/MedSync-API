@@ -11,6 +11,9 @@ namespace MedSync_API.Repositories
         /// <summary>Busca un paciente por su número de cédula o pasaporte.</summary>
         Task<Patient?> ObtenerPorDocumentoAsync(string documentoId);
 
+        /// <summary>Busca un paciente por su correo electrónico.</summary>
+        Task<Patient?> ObtenerPorEmailAsync(string email);
+
         /// <summary>Verifica si ya existe un paciente registrado con ese documento de identidad.</summary>
         Task<bool> ExisteDocumentoAsync(string documentoId);
     }

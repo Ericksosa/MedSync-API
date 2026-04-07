@@ -66,5 +66,7 @@ namespace MedSync_API.Models.ViewModels
 
         [MaxLength(20)]
         public string? Telefono { get; set; }
+
+        public DateTime? FechaNacimiento { get; set; }
     }
 }

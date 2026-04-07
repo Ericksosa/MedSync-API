@@ -19,5 +19,19 @@ namespace MedSync_API.Services
         /// Usado por el administrador para crear cuentas de médicos o administradores (RF02).
         /// </summary>
         Task<TokenRespuestaViewModel> RegistrarAsync(RegistroViewModel modelo);
+
+        /// <summary>
+        /// Lista usuarios del sistema con filtro opcional por rol.
+        /// </summary>
+        Task<IEnumerable<UsuarioViewModel>> ObtenerUsuariosAsync(string? rol = null);
+
+        /// <summary>Obtiene el perfil del usuario autenticado.</summary>
+        Task<PerfilUsuarioViewModel?> ObtenerPerfilAsync(string userId);
+
+        /// <summary>Actualiza nombre y correo del usuario autenticado.</summary>
+        Task<TokenRespuestaViewModel> ActualizarPerfilAsync(string userId, PerfilActualizarViewModel modelo);
+
+        /// <summary>Cambia la contraseña del usuario autenticado.</summary>
+        Task CambiarContrasenaAsync(string userId, CambiarContrasenaViewModel modelo);
     }
 }

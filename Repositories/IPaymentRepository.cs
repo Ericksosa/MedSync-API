@@ -16,5 +16,8 @@ namespace MedSync_API.Repositories
 
         /// <summary>Obtiene el pago asociado a una cita específica.</summary>
         Task<Payment?> ObtenerPorCitaAsync(int citaId);
+
+        /// <summary>Calcula el total de ingresos completados generados por un médico.</summary>
+        Task<decimal> ObtenerTotalGeneradoPorDoctorAsync(int doctorId);
     }
 }

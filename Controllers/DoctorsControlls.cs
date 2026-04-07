@@ -106,9 +106,11 @@ namespace MedSync_API.Controllers
         /// GET: api/doctors/5/disponibilidad
         /// </summary>
         [HttpGet("{medicoId:int}/disponibilidad")]
-        public async Task<ActionResult<IEnumerable<DisponibilidadViewModel>>> ObtenerDisponibilidad(int medicoId)
+        public async Task<ActionResult<IEnumerable<DisponibilidadViewModel>>> ObtenerDisponibilidad(
+            int medicoId,
+            [FromQuery] int? hospitalId)
         {
-            var disponibilidades = await _servicio.ObtenerDisponibilidadAsync(medicoId);
+            var disponibilidades = await _servicio.ObtenerDisponibilidadAsync(medicoId, hospitalId);
             return Ok(disponibilidades);
         }
 
@@ -151,6 +153,52 @@ namespace MedSync_API.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound($"Disponibilidad con id {id} no encontrada.");
+            }
+        }
+
+        /// <summary>
+        /// Obtiene los hospitales que maneja un médico.
+        /// GET: api/doctors/5/hospitales
+        /// </summary>
+        [HttpGet("{medicoId:int}/hospitales")]
+        [Authorize(Roles = "Administrador,Doctor")]
+        public async Task<ActionResult<IEnumerable<HospitalAsignadoViewModel>>> ObtenerHospitalesAsignados(int medicoId)
+        {
+            try
+            {
+                var hospitales = await _servicio.ObtenerHospitalesAsignadosAsync(medicoId);
+                return Ok(hospitales);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Médico con id {medicoId} no encontrado.");
+            }
+        }
+
+        /// <summary>
+        /// Actualiza los hospitales que maneja un médico.
+        /// PUT: api/doctors/5/hospitales
+        /// </summary>
+        [HttpPut("{medicoId:int}/hospitales")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> ActualizarHospitalesAsignados(
+            int medicoId,
+            [FromBody] HospitalesAsignadosActualizarViewModel modelo)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                await _servicio.ActualizarHospitalesAsignadosAsync(medicoId, modelo);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Médico con id {medicoId} no encontrado.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
             }
         }
     }

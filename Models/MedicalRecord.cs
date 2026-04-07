@@ -23,6 +23,19 @@ namespace MedSync_API.Models
         /// <summary>Fecha y hora en que fue creado el expediente (UTC).</summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>Ritmo cardiaco registrado (latidos por minuto).</summary>
+        public int? HeartRate { get; set; }
+
+        /// <summary>Temperatura corporal registrada en grados Celsius.</summary>
+        public decimal? Temperature { get; set; }
+
+        /// <summary>Presion arterial registrada. Ejemplo: 120/80.</summary>
+        [MaxLength(20)]
+        public string? BloodPressure { get; set; }
+
+        /// <summary>Fecha y hora de la ultima actualizacion de signos vitales (UTC).</summary>
+        public DateTime? LastVitalsUpdatedAt { get; set; }
+
         // ─── Propiedades de navegación ───────────────────────────────────────
 
         /// <summary>Paciente al que pertenece este expediente.</summary>

@@ -32,5 +32,10 @@ namespace MedSync_API.Services
         /// Valida que la transición de estado sea permitida por las reglas de negocio.
         /// </summary>
         Task CambiarEstadoAsync(int id, string nuevoEstado);
+
+        /// <summary>
+        /// Reprograma la fecha/hora de una cita existente.
+        /// </summary>
+        Task ReprogramarAsync(int id, DateTime nuevaFechaHora);
     }
 }

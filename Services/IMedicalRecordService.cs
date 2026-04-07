@@ -23,5 +23,10 @@ namespace MedSync_API.Services
         /// Emite una receta médica y la vincula al expediente del paciente (RF13).
         /// </summary>
         Task<RecetaViewModel> EmitirRecetaAsync(RecetaCrearViewModel modelo);
+
+        /// <summary>
+        /// Actualiza los signos vitales del expediente medico.
+        /// </summary>
+        Task ActualizarSignosVitalesAsync(int expedienteId, SignosVitalesActualizarViewModel modelo);
     }
 }

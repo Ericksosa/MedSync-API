@@ -63,4 +63,93 @@ namespace MedSync_API.Models.ViewModels
         /// <summary>Rol del usuario (Paciente, Doctor o Administrador).</summary>
         public string Rol { get; set; } = string.Empty;
     }
+
+    /// <summary>
+    /// ViewModel de respuesta para listados de usuarios.
+    /// </summary>
+    public class UsuarioViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+        public bool EstaActivo { get; set; } = true;
+        public DateTime CreadoEn { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel de perfil para el usuario autenticado.
+    /// </summary>
+    public class PerfilUsuarioViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;
+        public string Apellido { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// ViewModel para actualizar nombre y correo en el perfil.
+    /// </summary>
+    public class PerfilActualizarViewModel
+    {
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [MaxLength(50)]
+        public required string Nombre { get; set; }
+
+        [Required(ErrorMessage = "El apellido es obligatorio.")]
+        [MaxLength(50)]
+        public required string Apellido { get; set; }
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El correo electrónico no tiene un formato válido.")]
+        public required string Email { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel para cambio de contraseña del usuario autenticado.
+    /// </summary>
+    public class CambiarContrasenaViewModel
+    {
+        [Required(ErrorMessage = "La contraseña actual es obligatoria.")]
+        public required string ContrasenaActual { get; set; }
+
+        [Required(ErrorMessage = "La nueva contraseña es obligatoria.")]
+        [MinLength(8, ErrorMessage = "La nueva contraseña debe tener al menos 8 caracteres.")]
+        public required string NuevaContrasena { get; set; }
+    }
+
+        /// <summary>
+        /// ViewModel para auto-registro de pacientes (cuenta + perfil).
+        /// </summary>
+        public class PacienteRegistroRequestViewModel
+        {
+            [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+            [EmailAddress(ErrorMessage = "El correo electrónico no tiene un formato válido.")]
+            public required string Email { get; set; }
+
+            [Required(ErrorMessage = "La contraseña es obligatoria.")]
+            [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+            public required string Contrasena { get; set; }
+
+            [Required(ErrorMessage = "El nombre es obligatorio.")]
+            [MaxLength(50)]
+            public required string Nombre { get; set; }
+
+            [Required(ErrorMessage = "El apellido es obligatorio.")]
+            [MaxLength(50)]
+            public required string Apellido { get; set; }
+
+            [Required(ErrorMessage = "El documento de identidad es obligatorio.")]
+            [MaxLength(20)]
+            public required string DocumentoId { get; set; }
+
+            [MaxLength(20)]
+            public string? Telefono { get; set; }
+
+            [Required(ErrorMessage = "La fecha de nacimiento es obligatoria.")]
+            public DateTime FechaNacimiento { get; set; }
+        }
 }

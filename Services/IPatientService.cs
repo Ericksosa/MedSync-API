@@ -8,11 +8,17 @@ namespace MedSync_API.Services
     /// </summary>
     public interface IPatientService
     {
+        /// <summary>Obtiene todos los pacientes registrados.</summary>
+        Task<IEnumerable<PacienteViewModel>> ObtenerTodosAsync();
+
         /// <summary>
         /// Busca un paciente por su documento de identidad (cédula o pasaporte).
         /// Retorna null si no existe.
         /// </summary>
         Task<PacienteViewModel?> ObtenerPorDocumentoAsync(string documentoId);
+
+        /// <summary>Busca un paciente por su correo electrónico.</summary>
+        Task<PacienteViewModel?> ObtenerPorEmailAsync(string email);
 
         /// <summary>Obtiene un paciente por su identificador interno.</summary>
         Task<PacienteViewModel?> ObtenerPorIdAsync(int id);

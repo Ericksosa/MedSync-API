@@ -14,6 +14,9 @@ namespace MedSync_API.Services
         /// <summary>Registra el pago de una cita médica (RF16).</summary>
         Task<PagoViewModel> CrearAsync(PagoCrearViewModel modelo);
 
+        /// <summary>Actualiza el estado de un pago existente.</summary>
+        Task CambiarEstadoAsync(int id, string estado);
+
         /// <summary>
         /// Elimina un pago registrado por error.
         /// Solo permite eliminar pagos en estado "Pending".

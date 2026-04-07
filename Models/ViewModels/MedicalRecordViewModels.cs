@@ -12,6 +12,10 @@ namespace MedSync_API.Models.ViewModels
         public int PacienteId { get; set; }
         public string NombrePaciente { get; set; } = string.Empty;
         public DateTime CreadoEn { get; set; }
+        public int? RitmoCardiaco { get; set; }
+        public decimal? Temperatura { get; set; }
+        public string? PresionArterial { get; set; }
+        public DateTime? FechaHoraUltimaActualizacionSignos { get; set; }
 
         /// <summary>Diagnósticos registrados en este expediente (RF12).</summary>
         public IEnumerable<DiagnosticoViewModel> Diagnosticos { get; set; } = new List<DiagnosticoViewModel>();
@@ -97,6 +101,21 @@ namespace MedSync_API.Models.ViewModels
     }
 
     /// <summary>
+    /// ViewModel para actualizar signos vitales de un expediente.
+    /// </summary>
+    public class SignosVitalesActualizarViewModel
+    {
+        [Range(20, 250, ErrorMessage = "El ritmo cardiaco debe estar entre 20 y 250 BPM.")]
+        public int? RitmoCardiaco { get; set; }
+
+        [Range(30, 45, ErrorMessage = "La temperatura debe estar entre 30 y 45 °C.")]
+        public decimal? Temperatura { get; set; }
+
+        [MaxLength(20)]
+        public string? PresionArterial { get; set; }
+    }
+
+    /// <summary>
     /// ViewModel de respuesta con la disponibilidad horaria de un médico (RF23).
     /// </summary>
     public class DisponibilidadViewModel
@@ -104,6 +123,8 @@ namespace MedSync_API.Models.ViewModels
         public int Id { get; set; }
         public int MedicoId { get; set; }
         public string NombreMedico { get; set; } = string.Empty;
+        public int? HospitalId { get; set; }
+        public string NombreHospital { get; set; } = string.Empty;
 
         /// <summary>Día de la semana: 0 = Lunes, 6 = Domingo.</summary>
         public int DiaSemana { get; set; }
@@ -118,6 +139,9 @@ namespace MedSync_API.Models.ViewModels
     {
         [Required(ErrorMessage = "El médico es obligatorio.")]
         public int MedicoId { get; set; }
+
+        /// <summary>Hospital donde aplica esta disponibilidad.</summary>
+        public int? HospitalId { get; set; }
 
         /// <summary>Día de la semana (0 = Lunes, 6 = Domingo).</summary>
         [Required]

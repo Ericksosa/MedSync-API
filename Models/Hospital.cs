@@ -45,6 +45,9 @@ namespace MedSync_API.Models
         /// <summary>Médicos que ejercen en este hospital (RF22).</summary>
         [JsonIgnore] public ICollection<Doctor> Doctors { get; set; } = new List<Doctor>();
 
+        /// <summary>Asignaciones de médicos a este hospital (muchos-a-muchos).</summary>
+        [JsonIgnore] public ICollection<DoctorHospital> DoctorHospitals { get; set; } = new List<DoctorHospital>();
+
         /// <summary>Citas realizadas en este hospital.</summary>
         [JsonIgnore] public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 

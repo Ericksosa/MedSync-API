@@ -33,12 +33,15 @@ namespace MedSync_API.Models.ViewModels
         public string? Notas { get; set; }
 
         [Required(ErrorMessage = "El paciente es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El paciente es inválido.")]
         public int PacienteId { get; set; }
 
         [Required(ErrorMessage = "El médico es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El médico es inválido.")]
         public int MedicoId { get; set; }
 
         [Required(ErrorMessage = "El hospital es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El hospital es inválido.")]
         public int HospitalId { get; set; }
     }
 
@@ -51,5 +54,14 @@ namespace MedSync_API.Models.ViewModels
         [Required(ErrorMessage = "El estado es obligatorio.")]
         [MaxLength(20)]
         public required string Estado { get; set; }
+    }
+
+    /// <summary>
+    /// ViewModel de entrada para reprogramar una cita médica.
+    /// </summary>
+    public class CitaReprogramarViewModel
+    {
+        [Required(ErrorMessage = "La nueva fecha y hora es obligatoria.")]
+        public DateTime FechaHora { get; set; }
     }
 }
